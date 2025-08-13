@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "mapbox-gl": "^3.14.0",
@@ -23,7 +25,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "eslint-config-prettier": "^10.1.8",
     "mapshaper": "^0.6.109",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
