@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+project_outline.txt
 
 # debug
 npm-debug.log*
@@ -39,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#data
+/data/raw/*
+/data/processed/*
+data/census/*
+local_notes.md
