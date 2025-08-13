@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "format-python": "venv/bin/python -m ruff format .",
+    "format-python:check":"venv/bin/python -m ruff check ."
+   
   },
   "dependencies": {
     "mapbox-gl": "^3.14.0",
