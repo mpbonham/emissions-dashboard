@@ -243,69 +243,72 @@ export default function IncomeMap() {
   useEffect(() => {
     if (map.current || !dataLoaded) return
 
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!
+    const timer = setTimeout(() => {
+      mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current!,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-118.2437, 34.0522],
-      zoom: 8.5,
-    })
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current!,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-118.2437, 34.0522],
+        zoom: 8.0,
+      })
 
-    map.current.on('load', async () => {
-      try {
-        const geoResponse = await fetch(
-          '/data/processed/la-county-tracts.geojson'
-        )
-        const geoData = await geoResponse.json()
+      map.current.on('load', async () => {
+        try {
+          const geoResponse = await fetch(
+            '/data/processed/la-county-tracts.geojson'
+          )
+          const geoData = await geoResponse.json()
 
-        geoData.features.forEach(
-          (feature: { properties: Record<string, unknown> }) => {
-            const geoid = (feature.properties.GEOID ||
-              feature.properties.geoid) as string
+          geoData.features.forEach(
+            (feature: { properties: Record<string, unknown> }) => {
+              const geoid = (feature.properties.GEOID ||
+                feature.properties.geoid) as string
+              overlayConfigs.forEach(config => {
+                const data = overlayData.get(config.id)
+                const value = data?.get(geoid)
+                feature.properties[config.propertyName] = value || null
+              })
+            }
+          )
 
-            overlayConfigs.forEach(config => {
-              const data = overlayData.get(config.id)
-              const value = data?.get(geoid)
-              feature.properties[config.propertyName] = value || null
-            })
-          }
-        )
+          map.current!.addSource('la-tracts', {
+            type: 'geojson',
+            data: geoData,
+          })
 
-        map.current!.addSource('la-tracts', {
-          type: 'geojson',
-          data: geoData,
-        })
+          const initialConfig = overlayConfigs[0]
+          map.current!.addLayer({
+            id: 'tract-income-fill',
+            type: 'fill',
+            source: 'la-tracts',
+            paint: {
+              'fill-color': createColorExpression(initialConfig),
+              'fill-opacity': 0.7,
+            },
+          })
 
-        const initialConfig = overlayConfigs[0]
-        map.current!.addLayer({
-          id: 'tract-income-fill',
-          type: 'fill',
-          source: 'la-tracts',
-          paint: {
-            'fill-color': createColorExpression(initialConfig),
-            'fill-opacity': 0.7,
-          },
-        })
-
-        map.current!.addLayer({
-          id: 'tract-boundaries',
-          type: 'line',
-          source: 'la-tracts',
-          paint: {
-            'line-color': '#ffffff',
-            'line-width': 0.5,
-            'line-opacity': 0.8,
-          },
-        })
-      } catch (error) {
-        console.error('Error loading map data:', error)
-      }
-    })
+          map.current!.addLayer({
+            id: 'tract-boundaries',
+            type: 'line',
+            source: 'la-tracts',
+            paint: {
+              'line-color': '#ffffff',
+              'line-width': 0.5,
+              'line-opacity': 0.8,
+            },
+          })
+        } catch (error) {
+          console.error('Error loading map data:', error)
+        }
+      })
+    }, 200)
 
     return () => {
+      clearTimeout(timer)
       if (map.current) {
         map.current.remove()
+        map.current = null
       }
     }
   }, [dataLoaded, overlayData])
@@ -325,7 +328,7 @@ export default function IncomeMap() {
       <div className="relative">
         <div
           ref={mapContainer}
-          className="w-full h-[48rem] rounded-lg shadow-lg"
+          className="w-full h-[40rem] 2xl:h-[48rem] rounded-lg shadow-lg"
         />
 
         {activeConfig && (
