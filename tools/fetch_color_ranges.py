@@ -19,11 +19,11 @@ file_arr = [
 def calculate_color_ranges():
     for x in file_arr:
         file_path = f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_{x}"
-        
+
         if not os.path.exists(file_path):
             print(f"File not found: {file_path}")
             continue
-        
+
         try:
             df = pd.read_csv(file_path)
 
