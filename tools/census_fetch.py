@@ -1,6 +1,6 @@
 import os
 import requests
-
+import numpy as np
 import pandas as pd
 
 STATE_NUMBER = "06"  # Cali
@@ -75,7 +75,7 @@ def fetch_vehicles_per_household():
         f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_vehicles_per_household.csv"
     ):
         # B25044_001E is total occupied households
-        # 004E is owned with 1 vehicle and same logic through 008E which is 5+ vehicles owned
+        # 004E  1 vehicle and same logic through 008E which is 5+ vehicles and same for renting 1-5+
         url = f"https://api.census.gov/data/{YEAR}/acs/acs5"
         params = {
             "get": "B25044_001E,B25044_004E,B25044_005E,B25044_006E,B25044_007E,B25044_008E,B25044_011E,B25044_012E,B25044_013E,B25044_014E,B25044_015E",
@@ -281,4 +281,5 @@ def fetch_all_data():
 
 
 if __name__ == "__main__":
+    calculate_color_ranges_vehicles()
     fetch_all_data()
