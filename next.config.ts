@@ -1,7 +1,19 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  compress: true,
+  async headers() {
+    return [
+      {
+        source: '/data/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control', 
+            value: 'public, max-age=604800, immutable',
+          },
+        ],
+      },
+    ]
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig
