@@ -263,6 +263,92 @@ def fetch_home_ownership_rate():
     return None
 
 
+def fetch_travel_time():
+    if not os.path.exists(f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_travel_time.csv"):
+        # B08303 Travel Time to Work
+        # 001E: Total workers 16 years and over
+        # 002E: Less than 5 minutes
+        # 003E: 5 to 9 minutes
+        # 004E: 10 to 14 minutes
+        # 005E: 15 to 19 minutes
+        # 006E: 20 to 24 minutes
+        # 007E: 25 to 29 minutes
+        # 008E: 30 to 34 minutes
+        # 009E: 35 to 39 minutes
+        # 010E: 40 to 44 minutes
+        # 011E: 45 to 59 minutes
+        # 012E: 60 to 89 minutes
+        # 013E: 90 or more minutes
+
+        url = f"https://api.census.gov/data/{YEAR}/acs/acs5"
+        params = {
+            "get": "B08303_001E,B08303_002E,B08303_003E,B08303_004E,B08303_005E,B08303_006E,B08303_007E,B08303_008E,B08303_009E,B08303_010E,B08303_011E,B08303_012E,B08303_013E",
+            "for": "tract:*",
+            "in": f"state:{STATE_NUMBER} county:{COUNTY_NUMBER}",
+        }
+
+        response = requests.get(url, params=params)
+        data = response.json()
+
+        df = pd.DataFrame(data[1:], columns=data[0])
+
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
+
+        numeric_cols = [
+            "B08303_001E",
+            "B08303_002E",
+            "B08303_003E",
+            "B08303_004E",
+            "B08303_005E",
+            "B08303_006E",
+            "B08303_007E",
+            "B08303_008E",
+            "B08303_009E",
+            "B08303_010E",
+            "B08303_011E",
+            "B08303_012E",
+            "B08303_013E",
+        ]
+
+        for col in numeric_cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        # Calculate weighted average travel time in minutes
+        # Using midpoints of each time range
+        df["weighted_travel_time"] = (
+            2.5 * df["B08303_002E"]  # Less than 5 min -> 2.5
+            + 7 * df["B08303_003E"]  # 5-9 min -> 7
+            + 12 * df["B08303_004E"]  # 10-14 min -> 12
+            + 17 * df["B08303_005E"]  # 15-19 min -> 17
+            + 22 * df["B08303_006E"]  # 20-24 min -> 22
+            + 27 * df["B08303_007E"]  # 25-29 min -> 27
+            + 32 * df["B08303_008E"]  # 30-34 min -> 32
+            + 37 * df["B08303_009E"]  # 35-39 min -> 37
+            + 42 * df["B08303_010E"]  # 40-44 min -> 42
+            + 52 * df["B08303_011E"]  # 45-59 min -> 52
+            + 74.5 * df["B08303_012E"]  # 60-89 min -> 74.5
+            + 105 * df["B08303_013E"]  # 90+ min -> 105 (estimate)
+        )
+
+        df["avg_travel_time"] = (df["weighted_travel_time"] / df["B08303_001E"]).round(
+            2
+        )
+
+        df["avg_travel_time"] = df["avg_travel_time"].fillna(0)
+
+        final_df = df[["avg_travel_time", "GEOID"]].copy()
+
+        os.makedirs("data/census", exist_ok=True)
+        final_df.to_csv(
+            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_travel_time.csv",
+            index=False,
+        )
+    else:
+        print("Travel time data exists")
+
+    return None
+
+
 def fetch_all_data():
     """Fetch all census data"""
     print(
@@ -276,10 +362,10 @@ def fetch_all_data():
     fetch_rooms_per_household()
     fetch_college_degree_attainment()
     fetch_home_ownership_rate()
+    fetch_travel_time()
 
     print("All census data fetch complete!")
 
 
 if __name__ == "__main__":
-    calculate_color_ranges_vehicles()
     fetch_all_data()

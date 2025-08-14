@@ -13,6 +13,7 @@ file_arr = [
     "college_attainment.csv",
     "home_ownership_rate.csv",
     "median_rooms_per_household.csv",
+    "travel_time.csv",
 ]
 
 
