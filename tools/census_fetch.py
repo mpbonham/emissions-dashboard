@@ -302,17 +302,16 @@ def fetch_car_commute_time(state_number, county_number, year):
             df[col] = pd.to_numeric(df[col], errors="coerce")
             df[col] = df[col].fillna(0)
 
-   
         time_midpoints = {
-            "B08134_012E": 7.5,  
-            "B08134_013E": 12, 
-            "B08134_014E": 17,  
-            "B08134_015E": 22,  
-            "B08134_016E": 27, 
-            "B08134_017E": 32, 
-            "B08134_018E": 39.5,  
-            "B08134_019E": 52,  
-            "B08134_020E": 75,  
+            "B08134_012E": 7.5,
+            "B08134_013E": 12,
+            "B08134_014E": 17,
+            "B08134_015E": 22,
+            "B08134_016E": 27,
+            "B08134_017E": 32,
+            "B08134_018E": 39.5,
+            "B08134_019E": 52,
+            "B08134_020E": 75,
         }
 
         total_weighted_time = 0
@@ -413,7 +412,7 @@ def fetch_car_transport_emissions_per_household(state_number, county_number, yea
         total_co2 = (
             merged_df["car_avg_travel_time"]
             * merged_df["total_car_commuters"]
-            * 0.1  # 400g CO2/mile * 30mph * 2 trips * 250 days / 1M = 0.1 tons/year per minute
+            * 0.1  # 200 g CO₂/min × 2 trips/day × 250 days/year ÷ 1,000,000 g/ton
         )
 
         merged_df["car_co2_metric_tons_per_household"] = (
