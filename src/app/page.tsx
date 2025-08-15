@@ -11,12 +11,20 @@ export default function Home() {
           Explore demographic data across California census tracts with
           interactive maps and detailed overlays.
         </p>
-        <Link
-          href="/map"
-          className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
-        >
-          Explore the Map →
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href="/transport-map"
+            className="flex-1 inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-md font-semibold transition-colors shadow-lg"
+          >
+            Explore Transport Map →
+          </Link>
+          <Link
+            href="/map"
+            className="flex-1 inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-md font-semibold transition-colors shadow-lg"
+          >
+            Explore Household Data Map →
+          </Link>
+        </div>
       </div>
     </div>
   )

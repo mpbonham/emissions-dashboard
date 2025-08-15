@@ -184,6 +184,15 @@ function createColorExpression(config: OverlayConfig): ExpressionSpecification {
 }
 
 export default function IncomeMap() {
+  const [showNotification, setShowNotification] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowNotification(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const [overlayData, setOverlayData] = useState<
@@ -248,7 +257,7 @@ export default function IncomeMap() {
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current!,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/light-v11',
         center: [-118.2437, 34.0522],
         zoom: 8.0,
       })
@@ -325,6 +334,19 @@ export default function IncomeMap() {
 
   return (
     <div>
+      {showNotification && (
+        <div className="fixed top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
+          <div className="flex items-center justify-between">
+            <span>If map is not loading, please refresh the page</span>
+            <button
+              onClick={() => setShowNotification(false)}
+              className="ml-3 text-white hover:text-gray-200"
+            >
+              -
+            </button>
+          </div>
+        </div>
+      )}
       <div className="relative">
         <div
           ref={mapContainer}
