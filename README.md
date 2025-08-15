@@ -5,7 +5,7 @@ An interactive web application for visualizing census tract data with emissions 
 
 ## Overview
 
-This project creates interactive maps displaying census tract boundaries with various demographic and transportation metrics, including emissions data. Users can explore different data layers and visualize patterns across census tracts within California counties.
+This project creates interactive maps displaying census tract boundaries with various demographic and transportation metrics, including car commuter emissions data. Users can explore different data layers and visualize patterns across census tracts within California counties.
 
 ## Tech Stack
 
