@@ -41,7 +41,7 @@ my-mapbox-app/
 
 ## Data Sources & Methodology 
 
-This project utilizes emissions methodology developed by **EcoDataLab's Consumption-Based Emissions Inventory (CBEI)**
+This project was inspired by the **CBEI** methodology developed by  **EcoDataLab**.
 
 Census tract boundaries and demographic data are sourced from the U.S. Census Bureau's American Community Survey and TIGER/Line Shapefiles.
 
