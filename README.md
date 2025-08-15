@@ -39,7 +39,7 @@ my-mapbox-app/
 - Dynamic color coding based on data percentiles
 - County-specific data visualization
 
-## Data Sources & Methodology
+## Data Sources & Methodology 
 
 This project utilizes emissions methodology developed by **EcoDataLab's Consumption-Based Emissions Inventory (CBEI)**
 
