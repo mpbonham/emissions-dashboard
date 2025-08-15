@@ -39,6 +39,98 @@ const overlayConfigs: OverlayConfig[] = [
     formatValue: (value: number) =>
       value === Infinity ? `>${(40.7).toFixed(1)}` : value.toFixed(1),
   },
+  {
+    id: 'car-commute-time',
+    title: 'Average Car Commute Time (Minutes)',
+    dataFile: '/data/census/06037_car_commute_time.csv',
+    propertyName: 'car_avg_travel_time',
+    colorBrackets: [
+      { min: 0, max: 26.28, color: '#08306b' },
+      { min: 26.28, max: 28.15, color: '#2171b5' },
+      { min: 28.15, max: 29.51, color: '#6baed6' },
+      { min: 29.51, max: 30.47, color: '#c6dbef' },
+      { min: 30.47, max: 31.3, color: '#ffffcc' },
+      { min: 31.3, max: 32.12, color: '#fed976' },
+      { min: 32.12, max: 33.01, color: '#feb24c' },
+      { min: 33.01, max: 33.92, color: '#fd8d3c' },
+      { min: 33.92, max: 35.05, color: '#f03b20' },
+      { min: 35.05, max: 36.38, color: '#d12f2f' },
+      { min: 36.38, max: 38.57, color: '#bd0026' },
+      { min: 38.57, max: Infinity, color: '#7a0177' },
+    ],
+    formatValue: (value: number) =>
+      value === Infinity ? `>${(38.57).toFixed(1)}` : `${value.toFixed(1)}`,
+  },
+  {
+    id: 'car-commuter-percentage',
+    title: 'Car Commuter Percentage (%)',
+    dataFile: '/data/census/06037_car_commuter_percentage.csv',
+    propertyName: 'car_commuter_percentage',
+    colorBrackets: [
+      { min: 0, max: 0.55, color: '#08306b' },
+      { min: 0.55, max: 0.62, color: '#2171b5' },
+      { min: 0.62, max: 0.67, color: '#6baed6' },
+      { min: 0.67, max: 0.72, color: '#c6dbef' },
+      { min: 0.72, max: 0.75, color: '#ffffcc' },
+      { min: 0.75, max: 0.78, color: '#fed976' },
+      { min: 0.78, max: 0.8, color: '#feb24c' },
+      { min: 0.8, max: 0.83, color: '#fd8d3c' },
+      { min: 0.83, max: 0.85, color: '#f03b20' },
+      { min: 0.85, max: 0.87, color: '#d12f2f' },
+      { min: 0.87, max: 0.9, color: '#bd0026' },
+      { min: 0.9, max: Infinity, color: '#7a0177' },
+    ],
+    formatValue: (value: number) =>
+      value === Infinity
+        ? `>${(0.9 * 100).toFixed(0)}`
+        : `${(value * 100).toFixed(0)}%`,
+  },
+  {
+    id: 'car-transport-emissions',
+    title: 'Car Commute Emissions (metric tons CO2e per household)',
+    dataFile: '/data/census/06037_car_transport_emissions_per_household.csv',
+    propertyName: 'car_co2_metric_tons_per_household',
+    colorBrackets: [
+      { min: 0, max: 1.61, color: '#08306b' },
+      { min: 1.61, max: 2.06, color: '#2171b5' },
+      { min: 2.06, max: 2.44, color: '#6baed6' },
+      { min: 2.44, max: 2.7, color: '#c6dbef' },
+      { min: 2.7, max: 3.02, color: '#ffffcc' },
+      { min: 3.02, max: 3.33, color: '#fed976' },
+      { min: 3.33, max: 3.59, color: '#feb24c' },
+      { min: 3.59, max: 3.88, color: '#fd8d3c' },
+      { min: 3.88, max: 4.2, color: '#f03b20' },
+      { min: 4.2, max: 4.55, color: '#d12f2f' },
+      { min: 4.55, max: 5.12, color: '#bd0026' },
+      { min: 5.12, max: Infinity, color: '#7a0177' },
+    ],
+    formatValue: (value: number) =>
+      value === Infinity ? `>${(5.12).toFixed(1)}` : `${value.toFixed(1)} `,
+  },
+  {
+    id: 'latch-emissions',
+    title: 'LATCH Transport Emissions per Household',
+    dataFile: '/data/census/06037_latch_emissions.csv',
+    propertyName: 'co2_metric_tons_per_household',
+    colorBrackets: [
+      { min: 0, max: 2.76, color: '#08306b' },
+      { min: 2.76, max: 3.07, color: '#2171b5' },
+      { min: 3.07, max: 3.28, color: '#6baed6' },
+      { min: 3.28, max: 3.42, color: '#c6dbef' },
+      { min: 3.42, max: 3.56, color: '#ffffcc' },
+      { min: 3.56, max: 3.71, color: '#fed976' },
+      { min: 3.71, max: 3.85, color: '#feb24c' },
+      { min: 3.85, max: 4.0, color: '#fd8d3c' },
+      { min: 4.0, max: 4.16, color: '#f03b20' },
+      { min: 4.16, max: 4.32, color: '#d12f2f' },
+      { min: 4.32, max: 4.58, color: '#bd0026' },
+      { min: 4.58, max: Infinity, color: '#7a0177' },
+    ],
+    formatValue: (value: number) =>
+      value === Infinity
+        ? `>${(4.58).toFixed(2)} tons`
+        : `${value.toFixed(2)} `,
+  },
 ]
 
 function createColorExpression(config: OverlayConfig): ExpressionSpecification {
@@ -67,13 +159,13 @@ function createColorExpression(config: OverlayConfig): ExpressionSpecification {
   return conditions
 }
 
-export default function IncomeMap() {
+export default function TravelTimeMap() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const [overlayData, setOverlayData] = useState<
     Map<string, Map<string, number>>
   >(new Map())
-  const [activeOverlay, setActiveOverlay] = useState<string>('income')
+  const [activeOverlay, setActiveOverlay] = useState<string>('travel-time')
   const [dataLoaded, setDataLoaded] = useState(false)
 
   useEffect(() => {
@@ -111,14 +203,14 @@ export default function IncomeMap() {
   }, [])
 
   const updateMapLayer = (overlayId: string) => {
-    if (!map.current || !map.current.getLayer('tract-income-fill')) return
+    if (!map.current || !map.current.getLayer('tract-travel-time-fill')) return
 
     const config = overlayConfigs.find(c => c.id === overlayId)
     if (!config) return
 
     const colorExpression = createColorExpression(config)
     map.current.setPaintProperty(
-      'tract-income-fill',
+      'tract-travel-time-fill',
       'fill-color',
       colorExpression
     )
@@ -163,7 +255,7 @@ export default function IncomeMap() {
 
           const initialConfig = overlayConfigs[0]
           map.current!.addLayer({
-            id: 'tract-income-fill',
+            id: 'tract-travel-time-fill',
             type: 'fill',
             source: 'la-tracts',
             paint: {

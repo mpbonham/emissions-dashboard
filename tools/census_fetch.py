@@ -25,7 +25,7 @@ def fetch_median_household_income():
         data = response.json()
 
         df = pd.DataFrame(data[1:], columns=data[0])
-        df["geoid"] = df["state"] + df["county"] + df["tract"]
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
 
         df = df.drop(["state", "county", "tract"], axis=1)
 
@@ -56,7 +56,7 @@ def fetch_avg_household_size():
         data = response.json()
 
         df = pd.DataFrame(data[1:], columns=data[0])
-        df["geoid"] = df["state"] + df["county"] + df["tract"]
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
 
         df = df.drop(["state", "county", "tract"], axis=1)
         df.to_csv(
@@ -154,7 +154,7 @@ def fetch_rooms_per_household():
 
         df = pd.DataFrame(data[1:], columns=data[0])
 
-        df["geoid"] = df["state"] + df["county"] + df["tract"]
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
 
         df = df.drop(["state", "county", "tract"], axis=1)
 
@@ -263,89 +263,179 @@ def fetch_home_ownership_rate():
     return None
 
 
-def fetch_travel_time():
-    if not os.path.exists(f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_travel_time.csv"):
-        # B08303 Travel Time to Work
-        # 001E: Total workers 16 years and over
-        # 002E: Less than 5 minutes
-        # 003E: 5 to 9 minutes
-        # 004E: 10 to 14 minutes
-        # 005E: 15 to 19 minutes
-        # 006E: 20 to 24 minutes
-        # 007E: 25 to 29 minutes
-        # 008E: 30 to 34 minutes
-        # 009E: 35 to 39 minutes
-        # 010E: 40 to 44 minutes
-        # 011E: 45 to 59 minutes
-        # 012E: 60 to 89 minutes
-        # 013E: 90 or more minutes
-
+def fetch_car_commute_time():
+    if not os.path.exists(
+        f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_commute_time.csv"
+    ):
         url = f"https://api.census.gov/data/{YEAR}/acs/acs5"
         params = {
-            "get": "B08303_001E,B08303_002E,B08303_003E,B08303_004E,B08303_005E,B08303_006E,B08303_007E,B08303_008E,B08303_009E,B08303_010E,B08303_011E,B08303_012E,B08303_013E",
+            "get": "B08134_011E,B08134_012E,B08134_013E,B08134_014E,B08134_015E,B08134_016E,B08134_017E,B08134_018E,B08134_019E,B08134_020E",
             "for": "tract:*",
             "in": f"state:{STATE_NUMBER} county:{COUNTY_NUMBER}",
         }
-
         response = requests.get(url, params=params)
         data = response.json()
-
         df = pd.DataFrame(data[1:], columns=data[0])
-
         df["GEOID"] = df["state"] + df["county"] + df["tract"]
 
-        numeric_cols = [
-            "B08303_001E",
-            "B08303_002E",
-            "B08303_003E",
-            "B08303_004E",
-            "B08303_005E",
-            "B08303_006E",
-            "B08303_007E",
-            "B08303_008E",
-            "B08303_009E",
-            "B08303_010E",
-            "B08303_011E",
-            "B08303_012E",
-            "B08303_013E",
+        # Convert to numeric
+        travel_time_cols = [
+            "B08134_011E",
+            "B08134_012E",
+            "B08134_013E",
+            "B08134_014E",
+            "B08134_015E",
+            "B08134_016E",
+            "B08134_017E",
+            "B08134_018E",
+            "B08134_019E",
+            "B08134_020E",
         ]
 
-        for col in numeric_cols:
+        for col in travel_time_cols:
             df[col] = pd.to_numeric(df[col], errors="coerce")
+            df[col] = df[col].fillna(0)
 
-        # Calculate weighted average travel time in minutes
-        # Using midpoints of each time range
-        df["weighted_travel_time"] = (
-            2.5 * df["B08303_002E"]  # Less than 5 min -> 2.5
-            + 7 * df["B08303_003E"]  # 5-9 min -> 7
-            + 12 * df["B08303_004E"]  # 10-14 min -> 12
-            + 17 * df["B08303_005E"]  # 15-19 min -> 17
-            + 22 * df["B08303_006E"]  # 20-24 min -> 22
-            + 27 * df["B08303_007E"]  # 25-29 min -> 27
-            + 32 * df["B08303_008E"]  # 30-34 min -> 32
-            + 37 * df["B08303_009E"]  # 35-39 min -> 37
-            + 42 * df["B08303_010E"]  # 40-44 min -> 42
-            + 52 * df["B08303_011E"]  # 45-59 min -> 52
-            + 74.5 * df["B08303_012E"]  # 60-89 min -> 74.5
-            + 105 * df["B08303_013E"]  # 90+ min -> 105 (estimate)
-        )
+        # Assign midpoint values for each time range (in minutes)
+        time_midpoints = {
+            "B08134_012E": 7.5,  # Less than 10 minutes -> 7.5
+            "B08134_013E": 12,  # 10 to 14 minutes -> 12
+            "B08134_014E": 17,  # 15 to 19 minutes -> 17
+            "B08134_015E": 22,  # 20 to 24 minutes -> 22
+            "B08134_016E": 27,  # 25 to 29 minutes -> 27
+            "B08134_017E": 32,  # 30 to 34 minutes -> 32
+            "B08134_018E": 39.5,  # 35 to 44 minutes -> 39.5
+            "B08134_019E": 52,  # 45 to 59 minutes -> 52
+            "B08134_020E": 75,  # 60+ minutes -> 75 (estimate)
+        }
 
-        df["avg_travel_time"] = (df["weighted_travel_time"] / df["B08303_001E"]).round(
-            2
-        )
+        # Calculate weighted average travel time for car commuters
+        total_weighted_time = 0
+        total_car_commuters = df["B08134_011E"]  # Total car commuters
 
-        df["avg_travel_time"] = df["avg_travel_time"].fillna(0)
+        for col, midpoint in time_midpoints.items():
+            total_weighted_time += df[col] * midpoint
 
-        final_df = df[["avg_travel_time", "GEOID"]].copy()
+        # Calculate average travel time (avoid division by zero)
+        df["car_avg_travel_time"] = (
+            total_weighted_time / total_car_commuters.replace(0, 1)
+        ).round(2)
+
+        # Handle cases where no car commuters
+        df.loc[total_car_commuters == 0, "car_avg_travel_time"] = 0
+
+        # Keep only GEOID and car travel time
+        final_df = df[["car_avg_travel_time", "GEOID"]].copy()
 
         os.makedirs("data/census", exist_ok=True)
         final_df.to_csv(
-            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_travel_time.csv",
+            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_commute_time.csv",
             index=False,
         )
     else:
-        print("Travel time data exists")
+        print("car commute time data exists")
+    return None
 
+
+# TODO Rename by car commute percentage
+def fetch_vehicle_usage_rate():
+    # B08301_001E is total commuters
+    # B08301_002E is car, truck, or van commuters
+    if not os.path.exists(
+        f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_commuter_percentage.csv"
+    ):
+        url = f"https://api.census.gov/data/{YEAR}/acs/acs5"
+        params = {
+            "get": "B08301_001E,B08301_002E",
+            "for": "tract:*",
+            "in": f"state:{STATE_NUMBER} county:{COUNTY_NUMBER}",
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        df = pd.DataFrame(data[1:], columns=data[0])
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
+        numeric_cols = ["B08301_001E", "B08301_002E"]
+        for col in numeric_cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df["vehicle_usage_rate"] = (df["B08301_002E"] / df["B08301_001E"]).round(2)
+        df["vehicle_usage_rate"] = df["vehicle_usage_rate"].fillna(0)
+        final_df = df[["vehicle_usage_rate", "GEOID"]].copy()
+        os.makedirs("data/census", exist_ok=True)
+        final_df.to_csv(
+            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_commuter_percentage.csv",
+            index=False,
+        )
+    else:
+        print("vehicle usage rate data exists")
+    return None
+
+
+def fetch_car_transport_emissions_per_household():
+    if not os.path.exists(
+        f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_transport_emissions_per_household.csv"
+    ):
+        # Fetch total households from API (we don't need commuters since B08134_011E gives us car commuters)
+        url = f"https://api.census.gov/data/{YEAR}/acs/acs5"
+        params = {
+            "get": "B25001_001E,B08134_011E",  # Total households + total car commuters
+            "for": "tract:*",
+            "in": f"state:{STATE_NUMBER} county:{COUNTY_NUMBER}",
+        }
+        response = requests.get(url, params=params)
+        data = response.json()
+        df = pd.DataFrame(data[1:], columns=data[0])
+        df["GEOID"] = df["state"] + df["county"] + df["tract"]
+
+        # Convert to numeric
+        df["B25001_001E"] = pd.to_numeric(df["B25001_001E"], errors="coerce")
+        df["B08134_011E"] = pd.to_numeric(df["B08134_011E"], errors="coerce")
+        df["B25001_001E"] = df["B25001_001E"].fillna(0)
+        df["B08134_011E"] = df["B08134_011E"].fillna(0)
+
+        households_df = df[["B25001_001E", "B08134_011E", "GEOID"]].copy()
+        households_df.rename(
+            columns={
+                "B25001_001E": "total_households",
+                "B08134_011E": "total_car_commuters",
+            },
+            inplace=True,
+        )
+
+        # Load car commute time CSV
+        car_time_df = pd.read_csv(
+            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_commute_time.csv",
+            dtype={"GEOID": str},
+        )
+
+        # Convert GEOID to string
+        households_df["GEOID"] = households_df["GEOID"].astype(str)
+
+        # Merge datasets
+        merged_df = households_df.merge(car_time_df, on="GEOID", how="inner")
+
+        # Calculate total CO2 emissions in metric tons
+        # Formula: car_avg_travel_time * total_car_commuters * 0.1 (already accounts for 100% vehicle usage)
+        total_co2 = (
+            merged_df["car_avg_travel_time"]
+            * merged_df["total_car_commuters"]
+            * 0.1  # 400g CO2/mile * 30mph * 2 trips * 250 days / 1M = 0.1 tons/year per minute
+        )
+
+        # Calculate CO2 per household (avoid division by zero)
+        merged_df["car_co2_metric_tons_per_household"] = (
+            total_co2 / merged_df["total_households"].replace(0, 1)
+        ).round(3)
+
+        # Keep only GEOID and emissions per household
+        final_df = merged_df[["car_co2_metric_tons_per_household", "GEOID"]].copy()
+
+        os.makedirs("data/census", exist_ok=True)
+        final_df.to_csv(
+            f"data/census/{STATE_NUMBER}{COUNTY_NUMBER}_car_transport_emissions_per_household.csv",
+            index=False,
+        )
+    else:
+        print("car transport emissions per household data exists")
     return None
 
 
@@ -362,7 +452,9 @@ def fetch_all_data():
     fetch_rooms_per_household()
     fetch_college_degree_attainment()
     fetch_home_ownership_rate()
-    fetch_travel_time()
+    fetch_car_commute_time()
+    fetch_vehicle_usage_rate()
+    fetch_car_transport_emissions_per_household()
 
     print("All census data fetch complete!")
 

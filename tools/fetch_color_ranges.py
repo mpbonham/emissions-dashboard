@@ -9,11 +9,14 @@ YEAR = "2023"
 file_arr = [
     "median_household_income.csv",
     "vehicles_per_household.csv",
-    "avg_household_size.csv",
+    "car_commuter_percentage.csv",
     "college_attainment.csv",
     "home_ownership_rate.csv",
     "median_rooms_per_household.csv",
-    "travel_time.csv",
+    "car_commute_time.csv",
+    "vehicle_usage_rate.csv",
+    "car_transport_emissions_per_household.csv",
+    "latch_emissions.csv",
 ]
 
 
