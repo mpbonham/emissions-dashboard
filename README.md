@@ -48,9 +48,9 @@ Census tract boundaries and demographic data are sourced from the U.S. Census Bu
 ### HVMT & Transit Flow Analysis 
 #### View readmes for Charles' Data analytics
 
-[HVMT](./notebooks/README_HVMT_Regression.md)
+[HVMT](./notebooks/README_HVMT_Regression.md): Used linear regression, random forests, and extreme gradient boost to predict Vehicle Miles Traveled for two cases. One where all data was used, and one where only data available in the census API is used.
 
-[Transit Flow](./notebooks/README_transit_flow_analysis.md)
+[Transit Flow](./notebooks/README_transit_flow_analysis.md): Outlines different strategies to analyze transit flow.
 
 
 ### CO2 Emissions Calculation
