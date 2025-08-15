@@ -327,7 +327,7 @@ export default function TravelTimeMap() {
       <div className="relative">
         <div
           ref={mapContainer}
-          className="w-full h-[34rem] 2xl:h-[48rem] rounded-lg shadow-lg"
+          className="w-full h-[34rem] 2xl:h-[44rem] rounded-lg shadow-lg"
         />
 
         {activeConfig && (
