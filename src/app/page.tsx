@@ -25,6 +25,12 @@ export default function Home() {
             Explore Household Data Map →
           </Link>
         </div>
+        <a
+          href="https://github.com/mpbonham/emissions-dashboard"
+          className="block mt-8 bg-purple-500 hover:bg-purple-600 text-black px-6 py-3 rounded-lg font-semibold transition-colors"
+        >
+          GitHub
+        </a>
       </div>
     </div>
   )
