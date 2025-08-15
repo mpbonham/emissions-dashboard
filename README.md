@@ -1,6 +1,6 @@
 # Census Tract Mapping Application
 ## Authors: Maxwell Bonham & Charles DeLapa
-
+### [LIVE WEB APP](https://emissions-dashboard-chi.vercel.app/)
 An interactive web application for visualizing census tract data with emissions overlays across California counties.
 
 ## Overview
@@ -87,7 +87,7 @@ The project includes automated scripts for processing census data:
 
 **Process census tracts and fetch data**:
 ```bash
-./tools/fetch_all_data
+./tools/fetch_all_data.sh
 ```
 
 This script will:
