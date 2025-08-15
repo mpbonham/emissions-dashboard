@@ -45,6 +45,14 @@ This project was inspired by the **CBEI** methodology developed by  **EcoDataLab
 
 Census tract boundaries and demographic data are sourced from the U.S. Census Bureau's American Community Survey and TIGER/Line Shapefiles.
 
+### HVMT & Transit Flow Analysis 
+#### View readmes for Charles' Data analytics
+
+[HVMT](./notebooks/README_HVMT_Regression.md)
+
+[Transit Flow](./notebooks/README_transit_flow_analysis.md)
+
+
 ### CO2 Emissions Calculation
 
 Our transportation emissions estimates are calculated using the following methodology:
