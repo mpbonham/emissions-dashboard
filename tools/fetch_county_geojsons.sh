@@ -1,22 +1,24 @@
 #!/bin/bash
 
-# Navigate to the directory containing the project root
+
 cd "$(dirname "$0")/.."
 
-# Create output directory if it doesn't exist
 mkdir -p data/processed
+mkdir -p data/census
 
-# State and County codes
+# State and County codes (FIPS codes)
 STATE="06"  # California
+YEAR=2023
+
 declare -A counties=(
     ["sf"]="075"
     ["la"]="037" 
     ["sd"]="073"
-    ["santa_clara"]="085"  # San Jose is in Santa Clara County
+    ["santa_clara"]="085"  
     ["sacramento"]="067"
 )
 
-# Process each county
+echo "fetching tract shapes"
 for county_name in "${!counties[@]}"; do
     fips=${counties[$county_name]}
     echo "Processing $county_name (FIPS: ${STATE}${fips})..."
@@ -30,9 +32,24 @@ for county_name in "${!counties[@]}"; do
 
 done
 
+echo "fetching relevant csvs"
 
-echo "All counties processed!"
-
-for county_name in "$[!counties[@]}"; do 
+for county_name in "${!counties[@]}"; do
     fips=${counties[$county_name]}
-    echo ""
+    echo "Processing $county_name (FIPS: ${STATE}${fips})..."
+    
+    venv/bin/python tools/census_fetch.py \
+        --state "$STATE" \
+        --county "$fips" \
+        --year "$YEAR"
+done
+
+echo "generating color ranges"
+for county_name in "${!counties[@]}"; do
+    fips=${counties[$county_name]}
+    echo "Generating color ranges for $county_name (FIPS: ${STATE}${fips})..."
+    venv/bin/python tools/fetch_color_ranges.py \
+        --state "$STATE" \
+        --county "$fips"
+    echo "✓ Generated color ranges for ${STATE}${fips}"
+done
