@@ -18,7 +18,7 @@ This project creates interactive maps displaying census tract boundaries with va
 ## Project Structure
 
 ```
-my-mapbox-app/
+root/
 ├── src/
 │   ├── app/           # Next.js pages
 │   └── components/    # React components
